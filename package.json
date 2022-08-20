@@ -10,6 +10,11 @@
     "@babel/core": "^7.18.6",
     "@types/react": "~18.0.0",
     "@types/react-native": "~0.69.1",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "eslint": "^8.22.0",
+    "eslint-config-universe": "^11.1.0",
+    "prettier": "^2.7.1",
     "typescript": "^4.6.3"
   },
   "scripts": {
@@ -20,5 +25,8 @@
   },
   "version": "1.0.0",
   "private": true,
-  "name": "foundit"
+  "name": "foundit",
+  "eslintConfig": {
+    "extends": "universe/native"
+  }
 }
