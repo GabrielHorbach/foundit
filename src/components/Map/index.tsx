@@ -24,6 +24,7 @@ export default function Map() {
   return (
     <View className="w-100">
       <MapView
+        showsUserLocation
         initialRegion={
           location
             ? regionFrom(
