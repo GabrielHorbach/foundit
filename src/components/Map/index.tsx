@@ -45,6 +45,7 @@ export default function Map() {
         }
         onPress={onMapPress}
         style={{ width: dimensions.width, height: dimensions.height }}
+        testID="mapview"
       >
         {markers.map((marker, id: number) => (
           <Marker key={id} coordinate={marker.coordinate} />

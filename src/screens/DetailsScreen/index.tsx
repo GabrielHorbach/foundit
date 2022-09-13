@@ -2,7 +2,6 @@ import AntIcons from "@expo/vector-icons/AntDesign";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import * as ImagePicker from "expo-image-picker";
 import { useRef, useState } from "react";
 import {
   Text,
@@ -16,9 +15,10 @@ import {
 } from "react-native";
 
 import { useMarkers } from "../../context/Markers";
+import { takePhotoAsync } from "../../helpers/camera";
 import { RootStackParamList } from "../../types";
 
-type DetailsScreenProps = NativeStackScreenProps<RootStackParamList, "Details">;
+type DetailsScreenProps = Omit<NativeStackScreenProps<RootStackParamList, "Details">, "navigation">;
 
 export default function DetailsScreen({ route }: DetailsScreenProps) {
   const [imageUri, setImageUri] = useState("");
@@ -31,36 +31,6 @@ export default function DetailsScreen({ route }: DetailsScreenProps) {
 
   const saveButtonDisabled = !imageUri || !description;
 
-  async function isCameraAllowed() {
-    const { granted: alreadyGranted } = await ImagePicker.getCameraPermissionsAsync();
-    if (alreadyGranted) return true;
-
-    const { granted } = await ImagePicker.requestCameraPermissionsAsync();
-    return granted;
-  }
-
-  async function takePhotoAsync() {
-    if (!(await isCameraAllowed())) {
-      alert("need camera permission");
-      return;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-
-    if (result.cancelled) {
-      return;
-    }
-
-    const localUri = result.uri;
-    // const filename = localUri.split("/").pop();
-    // const match = /\.(\w+)$/.exec(filename!);
-    // const type = match ? `image/${match[1]}` : `image`;
-    setImageUri(localUri);
-  }
-
   async function handleSave() {
     const marker = {
       coordinate,
@@ -68,6 +38,11 @@ export default function DetailsScreen({ route }: DetailsScreenProps) {
     addMarker(marker);
 
     navigator.goBack();
+  }
+
+  async function handleTakePicture() {
+    const localUri = await takePhotoAsync();
+    setImageUri(localUri ?? "");
   }
 
   return (
@@ -103,10 +78,12 @@ export default function DetailsScreen({ route }: DetailsScreenProps) {
               source={{
                 uri: imageUri,
               }}
+              accessibilityLabel="Image preview"
             />
           ) : (
             <TouchableOpacity
-              onPress={takePhotoAsync}
+              onPress={handleTakePicture}
+              accessibilityLabel="Take a picture"
               className="p-4 w-100 rounded-md border-2 border-gray-200 bg-slate-50 flex-row items-center justify-between"
             >
               <Text className="text-gray-500 font-semibold">Take a picture</Text>
@@ -125,7 +102,10 @@ export default function DetailsScreen({ route }: DetailsScreenProps) {
         </View>
 
         <View className="w-100 flex-row self-end gap-1 my-10">
-          <TouchableOpacity className="w-1/2 py-3 mx-1 rounded-md border-2 border-blue-400 shrink">
+          <TouchableOpacity
+            accessibilityLabel="Cancel"
+            className="w-1/2 py-3 mx-1 rounded-md border-2 border-blue-400 shrink"
+          >
             <Text
               onPress={navigator.goBack}
               className="text-center text-blue-400 text-base font-bold"
@@ -140,6 +120,7 @@ export default function DetailsScreen({ route }: DetailsScreenProps) {
             }`}
             disabled={saveButtonDisabled}
             onPress={handleSave}
+            testID="save-button"
           >
             <Text className="text-white text-center text-base font-bold">Save</Text>
           </TouchableOpacity>
