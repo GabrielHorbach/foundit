@@ -61,7 +61,7 @@ export default function DetailsScreen({ route }: DetailsScreenProps) {
           flexDirection: "column",
           justifyContent: "space-between",
         }}
-        keyboardShouldPersistTaps
+        keyboardShouldPersistTaps="always"
         ref={scrollViewRef}
       >
         <View>
